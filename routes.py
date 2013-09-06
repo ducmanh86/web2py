@@ -73,12 +73,14 @@ default_function = 'index'               # ordinarily set in app-specific routes
 routes_in = (
     ('/api/1.0', '/server_persys/api_1_0'),
     ('/api/1.0/$anything', '/server_persys/api_1_0/$anything'),
-    ('.*://(localhost|127.0.0.1):\w* /', '/admin'),
-    ('.*://(localhost|127.0.0.1):\w* /$anything', '/admin/$anything'),
-    ('/', '/server_persys'),
+    ('/error', '/server_persys/default/error'),
+    ('/error/$anything', '/server_persys/default/error/$anything'),
     ('/server_persys/api_1_0', '/_server_persys/api_1_0'),
     ('/server_persys/api_1_0/$anything', '/_server_persys/api_1_0/$anything'),
     ('/server_persys/$anything', '/server_persys/$anything'),
+    ('.*://(localhost|127.0.0.1):\w* /', '/admin'),
+    ('.*://(localhost|127.0.0.1):\w* /$anything', '/admin/$anything'),
+    ('/', '/server_persys'),
     ('/favicon\.ico', '/server_persys_v1/static/favicon.ico'),
     ('/favicon\.png', '/server_persys_v1/static/favicon.png'),
     ('/robots\.txt', '/server_persys_v1/static/robots.txt'),
@@ -113,12 +115,12 @@ routes_onerror = [
 #     (r'server_persys/400', r'/server_persys/default/login')
 #    ,(r'server_persys/*', r'/server_persys/static/fail.html')
 #    ,(r'*/404', r'/server_persys/static/cantfind.html')
-    (r'*/*', r'/server_persys/default/error/index'),
+    (r'*/*', r'/error'),
 ]
 
 # specify action in charge of error handling
 #
-#error_handler = dict(application='server_persys_v1',
+#error_handler = dict(application='server_persys',
 #                     controller='default',
 #                     function='error')
 
