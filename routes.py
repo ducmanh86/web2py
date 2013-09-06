@@ -4,7 +4,7 @@
 # are used when the respective element is missing from the
 # (possibly rewritten) incoming URL
 #
-default_application = 'server_persys_v1'    # ordinarily set in base routes.py
+default_application = 'server_persys'    # ordinarily set in base routes.py
 default_controller = 'default'           # ordinarily set in app-specific routes.py
 default_function = 'index'               # ordinarily set in app-specific routes.py
 
@@ -71,23 +71,25 @@ default_function = 'index'               # ordinarily set in app-specific routes
 #)
 
 routes_in = (
-    # ('/admin', '/admin/default/index'),
-    # ('/admin/$anything', '/admin/$anything'),
-    # ('.*://localhost:\w*', '/admin/default/index'),
-    ('/api/v1', '/server_persys_v1/'),
-    ('/api/v1/$anything', '/server_persys_v1/$anything'),
-    ('.*://localhost:\w* /', '/admin/default/site'),
-    ('.*://localhost:\w* /$anything', '/admin/$anything'),
-    ('/', '/server_persys_v1/'),
+    ('/api/1.0', '/server_persys/api_1_0'),
+    ('/api/1.0/$anything', '/server_persys/api_1_0/$anything'),
+    ('.*://(localhost|127.0.0.1):\w* /', '/admin'),
+    ('.*://(localhost|127.0.0.1):\w* /$anything', '/admin/$anything'),
+    ('/', '/server_persys'),
+    ('/server_persys/api_1_0', '/_server_persys/api_1_0'),
+    ('/server_persys/api_1_0/$anything', '/_server_persys/api_1_0/$anything'),
+    ('/server_persys/$anything', '/server_persys/$anything'),
     ('/favicon\.ico', '/server_persys_v1/static/favicon.ico'),
     ('/favicon\.png', '/server_persys_v1/static/favicon.png'),
     ('/robots\.txt', '/server_persys_v1/static/robots.txt'),
-    ('/$anything', '/invalid'),
+    ('/$anything', '/_$anything'),
 )
 
 routes_out = (
-    ('/admin/$anything', '/$anything'),
-    ('/server_persys_v1/$anything', '/api/v1/$anything'),
+    ('.*://(localhost|127.0.0.1):\w* /admin/$anything', '/$anything'),
+    ('/server_persys/api_1_0/$anything', '/api/1.0/$anything'),
+    ('/server_persys/$anything', '/server_persys/$anything'),
+    ('/$anything', '/invalid'),
 )
 
 # Specify log level for rewrite's debug logging
@@ -108,10 +110,10 @@ logging = 'debug'
 # variables.  Traceback information will be stored in the ticket.
 #
 routes_onerror = [
-#     (r'server_persys/400', r'/server_persys_v1/default/login')
-#    ,(r'server_persys/*', r'/server_persys_v1/static/fail.html')
-#    ,(r'*/404', r'/server_persys_v1/static/cantfind.html')
-    (r'*/*', r'/api/v1/default/error/index'),
+#     (r'server_persys/400', r'/server_persys/default/login')
+#    ,(r'server_persys/*', r'/server_persys/static/fail.html')
+#    ,(r'*/404', r'/server_persys/static/cantfind.html')
+    (r'*/*', r'/server_persys/default/error/index'),
 ]
 
 # specify action in charge of error handling
