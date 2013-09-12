@@ -4,7 +4,7 @@
 # are used when the respective element is missing from the
 # (possibly rewritten) incoming URL
 #
-default_application = 'server_persys'    # ordinarily set in base routes.py
+default_application = 'init'             # ordinarily set in base routes.py
 default_controller = 'default'           # ordinarily set in app-specific routes.py
 default_function = 'index'               # ordinarily set in app-specific routes.py
 
@@ -73,11 +73,15 @@ default_function = 'index'               # ordinarily set in app-specific routes
 routes_in = (
     ('/api/1.0', '/server_persys/api_1_0'),
     ('/api/1.0/$anything', '/server_persys/api_1_0/$anything'),
-    ('/error', '/server_persys/default/error'),
-    ('/error/$anything', '/server_persys/default/error/$anything'),
+    ('/error', '/init/default/error'),
+    ('/error/$anything', '/init/default/error/$anything'),
     ('/server_persys/api_1_0', '/_server_persys/api_1_0'),
     ('/server_persys/api_1_0/$anything', '/_server_persys/api_1_0/$anything'),
     ('/server_persys/$anything', '/server_persys/$anything'),
+    ('/init', '/init'),
+    ('/init/$anything', '/init/$anything'),
+    ('/gcm', '/gcm'),
+    ('/gcm/$anything', '/gcm/$anything'),
     ('.*://(localhost|127.0.0.1):\w* /', '/admin'),
     ('.*://(localhost|127.0.0.1):\w* /$anything', '/admin/$anything'),
     ('/', '/server_persys'),
@@ -91,6 +95,8 @@ routes_out = (
     ('.*://(localhost|127.0.0.1):\w* /admin/$anything', '/$anything'),
     ('/server_persys/api_1_0/$anything', '/api/1.0/$anything'),
     ('/server_persys/$anything', '/server_persys/$anything'),
+    ('/init/$anything', '/init/$anything'),
+    ('/gcm/$anything', '/gcm/$anything'),
     ('/$anything', '/invalid'),
 )
 

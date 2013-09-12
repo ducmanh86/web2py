@@ -39,6 +39,8 @@ cron.master
 applications/*
 !applications/admin
 !applications/admin/*
+!applications/init
+!applications/init/*
 applications/*/databases/*
 applications/*/sessions/*
 applications/*/errors/*
