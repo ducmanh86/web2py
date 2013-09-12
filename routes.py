@@ -84,7 +84,8 @@ routes_in = (
     ('/gcm/$anything', '/gcm/$anything'),
     ('.*://(localhost|127.0.0.1):\w* /', '/admin'),
     ('.*://(localhost|127.0.0.1):\w* /$anything', '/admin/$anything'),
-    ('/', '/server_persys'),
+    ('/', '/init'),
+    ('/$anything', '/init/$anything'),
     ('/favicon\.ico', '/server_persys_v1/static/favicon.ico'),
     ('/favicon\.png', '/server_persys_v1/static/favicon.png'),
     ('/robots\.txt', '/server_persys_v1/static/robots.txt'),
@@ -95,9 +96,9 @@ routes_out = (
     ('.*://(localhost|127.0.0.1):\w* /admin/$anything', '/$anything'),
     ('/server_persys/api_1_0/$anything', '/api/1.0/$anything'),
     ('/server_persys/$anything', '/server_persys/$anything'),
-    ('/init/$anything', '/init/$anything'),
     ('/gcm/$anything', '/gcm/$anything'),
-    ('/$anything', '/invalid'),
+    #('/init/$anything', '/init/$anything'),
+    ('/init/$anything', '/$anything'),
 )
 
 # Specify log level for rewrite's debug logging
