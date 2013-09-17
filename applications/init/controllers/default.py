@@ -24,6 +24,8 @@ def index():
 
 def error():
     response.view = 'generic.html'
+    if 'ticket' in request.vars:
+        request.vars.ticket = "localhost/default/ticket/" + request.vars.ticket
     return request.vars
 
 
