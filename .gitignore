@@ -16,6 +16,7 @@ index.yaml
 routes.py
 logging.conf
 logs/*
+.idea/*
 gluon/tests/VERSION
 gluon/tests/sql.log
 httpserver.log
