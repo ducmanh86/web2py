@@ -13,33 +13,32 @@ FOR INTERNAL USE ONLY
 """
 
 import re
-import sys
 import fnmatch
 import os
 import copy
 import random
 import __builtin__
-from storage import Storage, List
-from template import parse_template
-from restricted import restricted, compile2
-from fileutils import mktree, listdir, read_file, write_file
-from myregex import regex_expose
-from languages import translator
-from dal import BaseAdapter, SQLDB, SQLField, DAL, Field
-from sqlhtml import SQLFORM, SQLTABLE
-from cache import Cache
-from globals import current, Response
-import settings
-from cfs import getcfs
-import html
-import validators
-from http import HTTP, redirect
+from gluon.storage import Storage, List
+from gluon.template import parse_template
+from gluon.restricted import restricted, compile2
+from gluon.fileutils import mktree, listdir, read_file, write_file
+from gluon.myregex import regex_expose
+from gluon.languages import translator
+from gluon.dal import BaseAdapter, SQLDB, SQLField, DAL, Field
+from gluon.sqlhtml import SQLFORM, SQLTABLE
+from gluon.cache import Cache
+from gluon.globals import current, Response
+from gluon import settings
+from gluon.cfs import getcfs
+from gluon import html
+from gluon import validators
+from gluon.http import HTTP, redirect
 import marshal
 import shutil
 import imp
 import logging
 logger = logging.getLogger("web2py")
-import rewrite
+from gluon import rewrite
 from custom_import import custom_import_install
 
 try:
@@ -167,15 +166,15 @@ def LOAD(c=None, f='index', args=None, vars=None,
             elif timeout <= 0:
                 raise ValueError(
                     "Timeout argument must be greater than zero or None")
-            statement = "web2py_component('%s','%s', %s, %s);" \
+            statement = "$.web2py.component('%s','%s', %s, %s);" \
                 % (url, target, timeout, times)
+            attr['_data-w2p_timeout'] = timeout
+            attr['_data-w2p_times'] = times
         else:
-            statement = "web2py_component('%s','%s');" % (url, target)
-        script = SCRIPT(statement, _type="text/javascript")
-        if not content is None:
-            return TAG[''](script, DIV(content, **attr))
-        else:
-            return TAG[''](script)
+            statement = "$.web2py.component('%s','%s');" % (url, target)
+        attr['_data-w2p_remote'] = url
+        if not target is None:
+            return DIV(content, **attr)
 
     else:
         if not isinstance(args, (list, tuple)):
@@ -226,7 +225,7 @@ def LOAD(c=None, f='index', args=None, vars=None,
             link = URL(request.application, c, f, r=request,
                        args=args, vars=vars, extension=extension,
                        user_signature=user_signature)
-            js = "web2py_trap_form('%s','%s');" % (link, target)
+            js = "$.web2py.trap_form('%s','%s');" % (link, target)
         script = js and SCRIPT(js, _type="text/javascript") or ''
         return TAG[''](DIV(XML(page), **attr), script)
 
@@ -254,7 +253,7 @@ class LoadFactory(object):
             url = url or html.URL(request.application, c, f, r=request,
                                   args=args, vars=vars, extension=extension,
                                   user_signature=user_signature)
-            script = html.SCRIPT('web2py_component("%s","%s")' % (url, target),
+            script = html.SCRIPT('$.web2py.component("%s","%s")' % (url, target),
                                  _type="text/javascript")
             return html.TAG[''](script, html.DIV(content, **attr))
         else:
@@ -305,7 +304,7 @@ class LoadFactory(object):
                 link = html.URL(request.application, c, f, r=request,
                                 args=args, vars=vars, extension=extension,
                                 user_signature=user_signature)
-                js = "web2py_trap_form('%s','%s');" % (link, target)
+                js = "$.web2py.trap_form('%s','%s');" % (link, target)
             script = js and html.SCRIPT(js, _type="text/javascript") or ''
             return html.TAG[''](html.DIV(html.XML(page), **attr), script)
 

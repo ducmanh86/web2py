@@ -18,12 +18,18 @@ def index():
     if you need a simple wiki simple replace the two lines below with:
     return auth.wiki()
     """
-    response.flash = T("Welcome to web2py!")
+    from datetime import datetime
+    return dict(time=str(datetime.utcnow()))
+    import logs
+    logs.write_log("Manh vo dich")
+    return logs.read_log("<br>")
+    #response.flash = T("Welcome to web2py!" + str(logs.read_log("<br>")))
     return dict(message=T('Hello World'))
 
 
 def error():
     response.view = 'generic.html'
+    request.vars["ticket"] = URL(a="", c="default", f="ticket", host="localhost", args=request.vars["ticket"])
     return request.vars
 
 

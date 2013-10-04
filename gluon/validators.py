@@ -19,8 +19,8 @@ import struct
 import decimal
 import unicodedata
 from cStringIO import StringIO
-from utils import simple_hash, web2py_uuid, DIGEST_ALG_BY_SIZE
-from dal import FieldVirtual, FieldMethod
+from gluon.utils import simple_hash, web2py_uuid, DIGEST_ALG_BY_SIZE
+from gluon.dal import FieldVirtual, FieldMethod
 
 JSONErrors = (NameError, TypeError, ValueError, AttributeError,
               KeyError)
@@ -42,6 +42,7 @@ __all__ = [
     'IS_DATETIME',
     'IS_DECIMAL_IN_RANGE',
     'IS_EMAIL',
+    'IS_LIST_OF_EMAILS',
     'IS_EMPTY_OR',
     'IS_EXPR',
     'IS_FLOAT_IN_RANGE',
@@ -346,13 +347,15 @@ class IS_JSON(Validator):
         ('spam1234', 'invalid json')
     """
 
-    def __init__(self, error_message='invalid json'):
+    def __init__(self, error_message='invalid json', native_json=False):
+        self.native_json = native_json
         self.error_message = error_message
 
     def __call__(self, value):
-        if value is None:
-            return None
         try:
+            if self.native_json:
+                simplejson.loads(value) # raises error in case of malformed json
+                return (value, None) #  the serialized value is not passed
             return (simplejson.loads(value), None)
         except JSONErrors:
             return (value, translate(self.error_message))
@@ -812,7 +815,7 @@ class IS_FLOAT_IN_RANGE(Validator):
         dot='.'
     ):
         self.minimum = self.maximum = None
-        self.dot = dot
+        self.dot = str(dot)
         if minimum is None:
             if maximum is None:
                 if error_message is None:
@@ -918,7 +921,7 @@ class IS_DECIMAL_IN_RANGE(Validator):
         dot='.'
     ):
         self.minimum = self.maximum = None
-        self.dot = dot
+        self.dot = str(dot)
         if minimum is None:
             if maximum is None:
                 if error_message is None:
@@ -1176,6 +1179,39 @@ class IS_EMAIL(Validator):
                 return (value, None)
         return (value, translate(self.error_message))
 
+class IS_LIST_OF_EMAILS(object):
+    """
+    use as follows:
+    Field('emails','list:string',
+          widget=SQLFORM.widgets.text.widget,
+          requires=IS_LIST_OF_EMAILS(),
+          represent=lambda v,r: \
+             SPAN(*[A(x,_href='mailto:'+x) for x in (v or [])])
+          )
+    """
+    split_emails = re.compile('[^,;\s]+')
+    def __init__(self, error_message = 'Invalid emails: %s'):
+        self.error_message = error_message
+
+    def __call__(self, value):
+        bad_emails = []
+        emails = []
+        f = IS_EMAIL()
+        for email in self.split_emails.findall(value):
+            if not email in emails:
+                emails.append(email)
+            error = f(email)[1]
+            if error and not email in bad_emails:
+                bad_emails.append(email)
+        if not bad_emails:
+            return (value, None)
+        else:
+            return (value, 
+                    translate(self.error_message) % ', '.join(bad_emails))
+
+    def formatter(self,value,row=None):
+        return ', '.join(value or [])
+    
 
 # URL scheme source:
 # <http://en.wikipedia.org/wiki/URI_scheme> obtained on 2008-Nov-10
@@ -2665,8 +2701,8 @@ class IS_EMPTY_OR(Validator):
         if hasattr(other, 'options'):
             self.options = self._options
 
-    def _options(self, zero=False):
-        options = self.other.options(zero=zero)
+    def _options(self):
+        options = self.other.options()
         if (not options or options[0][0] != '') and not self.multiple:
             options.insert(0, ('', ''))
         return options
@@ -2888,7 +2924,8 @@ class CRYPT(object):
                  key=None,
                  digest_alg='pbkdf2(1000,20,sha512)',
                  min_length=0,
-                 error_message='too short', salt=True):
+                 error_message='too short', salt=True,
+                 max_length=1024):
         """
         important, digest_alg='md5' is not the default hashing algorithm for
         web2py. This is only an example of usage of this function.
@@ -2899,10 +2936,12 @@ class CRYPT(object):
         self.key = key
         self.digest_alg = digest_alg
         self.min_length = min_length
+        self.max_length = max_length
         self.error_message = error_message
         self.salt = salt
 
     def __call__(self, value):
+        value = value and value[:self.max_length]
         if len(value) < self.min_length:
             return ('', translate(self.error_message))
         return (LazyCrypt(self, value), None)
@@ -3493,7 +3532,7 @@ class IS_IPV6(Validator):
     ('2001::8ffa:fe22:b3af', None)
     >>> IS_IPV6(subnets='invalidsubnet')('2001::8ffa:fe22:b3af')
     ('2001::8ffa:fe22:b3af', 'invalid subnet provided')
-    
+
     """
 
     def __init__(
@@ -3521,7 +3560,7 @@ class IS_IPV6(Validator):
         try:
             import ipaddress
         except ImportError:
-            from contrib import ipaddr as ipaddress
+            from gluon.contrib import ipaddr as ipaddress
 
         try:
             ip = ipaddress.IPv6Address(value)
@@ -3744,7 +3783,7 @@ class IS_IPADDRESS(Validator):
         try:
             import ipaddress
         except ImportError:
-            from contrib import ipaddr as ipaddress
+            from gluon.contrib import ipaddr as ipaddress
 
         try:
             ip = ipaddress.ip_address(value)

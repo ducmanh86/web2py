@@ -16,10 +16,10 @@ default_function = 'index'               # ordinarily set in app-specific routes
 # Example: support welcome, admin, app and myapp, with myapp the default:
 
 # routes_app = (
-    # ('localhost/$anything', 'admin'),
-    # (r'/(?P<app>server_persys_v1|admin)\b.*', r'\g<app>'),
-    # (r'(.*)', r'server_persys_v1'),
-    # (r'/?(.*)', r'server_persys_v1'),
+# ('localhost/$anything', 'admin'),
+# (r'/(?P<app>server_persys_v1|admin)\b.*', r'\g<app>'),
+# (r'(.*)', r'server_persys_v1'),
+# (r'/?(.*)', r'server_persys_v1'),
 # )
 
 # routes_in is a tuple of tuples.  The first item in each is a regexp that will
@@ -35,20 +35,20 @@ default_function = 'index'               # ordinarily set in app-specific routes
 #BASE = ''  # optonal prefix for incoming URLs
 
 #routes_in = (
-    # do not reroute admin unless you want to disable it
+# do not reroute admin unless you want to disable it
 #    (BASE + '/admin', '/admin/default/index'),
 #    (BASE + '/admin/$anything', '/admin/$anything'),
-    # do not reroute appadmin unless you want to disable it
+# do not reroute appadmin unless you want to disable it
 #    (BASE + '/$app/appadmin', '/$app/appadmin/index'),
 #    (BASE + '/$app/appadmin/$anything', '/$app/appadmin/$anything'),
-    # do not reroute static files
+# do not reroute static files
 #    (BASE + '/$app/static/$anything', '/$app/static/$anything'),
-    # reroute favicon and robots, use exable for lack of better choice
+# reroute favicon and robots, use exable for lack of better choice
 #    ('/favicon.ico', '/examples/static/favicon.ico'),
 #    ('/robots.txt', '/examples/static/robots.txt'),
-    # do other stuff
+# do other stuff
 #    ((r'.*http://otherdomain.com.* (?P<any>.*)', r'/app/ctr\g<any>')),
-    # remove the BASE prefix
+# remove the BASE prefix
 #    (BASE + '/$anything', '/$anything'),
 #)
 
@@ -57,16 +57,16 @@ default_function = 'index'               # ordinarily set in app-specific routes
 #
 
 #routes_out = (
-    # do not reroute admin unless you want to disable it
+# do not reroute admin unless you want to disable it
 #    ('/admin/$anything', BASE + '/admin/$anything'),
-    # do not reroute appadmin unless you want to disable it
+# do not reroute appadmin unless you want to disable it
 #    ('/$app/appadmin/$anything', BASE + '/$app/appadmin/$anything'),
-    # do not reroute static files
+# do not reroute static files
 #    ('/$app/static/$anything', BASE + '/$app/static/$anything'),
-    # do other stuff
+# do other stuff
 #    (r'.*http://otherdomain.com.* /app/ctr(?P<any>.*)', r'\g<any>'),
 #    (r'/app(?P<any>.*)', r'\g<any>'),
-    # restore the BASE prefix
+# restore the BASE prefix
 #    ('/$anything', BASE + '/$anything'),
 #)
 
@@ -118,10 +118,10 @@ logging = 'debug'
 # The error handling page is also passed the error code and ticket as
 # variables.  Traceback information will be stored in the ticket.
 #
-routes_onerror = [
 #     (r'server_persys/400', r'/server_persys/default/login')
 #    ,(r'server_persys/*', r'/server_persys/static/fail.html')
 #    ,(r'*/404', r'/server_persys/static/cantfind.html')
+routes_onerror = [
     (r'*/*', r'/error'),
 ]
 
@@ -136,8 +136,15 @@ routes_onerror = [
 # ErrorMessageTicket takes a string format dictionary containing (only) the
 # "ticket" key.
 
+
+#['env']['server_port']
 error_message = '<html><body><h1>%s</h1></body></html>'
-error_message_ticket = '<html><body><h1>Internal error</h1>Ticket issued: <a href="/admin/default/ticket/%(ticket)s" target="_blank">%(ticket)s</a></body></html>'
+error_message_ticket = '<html>' \
+                       '<body>' \
+                       '<h1>Internal error</h1>' \
+                       'Ticket issued: <a href="/admin/default/ticket/%(ticket)s" target="_blank">%(ticket)s</a>' \
+                       '</body>' \
+                       '</html>'
 
 # specify a list of apps that bypass args-checking and use request.raw_args
 #
@@ -146,7 +153,7 @@ error_message_ticket = '<html><body><h1>Internal error</h1>Ticket issued: <a hre
 
 
 def __routes_doctest():
-    '''
+    """
     Dummy function for doctesting routes.py.
 
     Use filter_url() to test incoming or outgoing routes;
@@ -224,9 +231,11 @@ def __routes_doctest():
     '^.*?:https?://[^:/]+:[a-z]+ /(?P<c>\\\\w+)/(?P<f>\\\\w+)$'
     >>> compile_regex('/$c/$f', '/init/$c/$f')[1]
     '/init/\\\\g<c>/\\\\g<f>'
-    '''
+    """
     pass
+
 
 if __name__ == '__main__':
     import doctest
+
     doctest.testmod()

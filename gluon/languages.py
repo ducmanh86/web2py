@@ -15,7 +15,6 @@ import re
 import sys
 import pkgutil
 import logging
-import marshal
 from cgi import escape
 from threading import RLock
 
@@ -24,14 +23,14 @@ try:
 except ImportError:
     import copy_reg # python 2
 
-from portalocker import read_locked, LockedFile
+from gluon.portalocker import read_locked, LockedFile
 from utf8 import Utf8
 
-from fileutils import listdir
-import settings
-from cfs import getcfs
-from html import XML, xmlescape
-from contrib.markmin.markmin2html import render, markmin_escape
+from gluon.fileutils import listdir
+import gluon.settings as settings
+from gluon.cfs import getcfs
+from gluon.html import XML, xmlescape
+from gluon.contrib.markmin.markmin2html import render, markmin_escape
 from string import maketrans
 
 __all__ = ['translator', 'findT', 'update_all_languages']
@@ -68,8 +67,8 @@ regex_param = re.compile(r'{(?P<s>.+?)}')
 
 # pattern for a valid accept_language
 regex_language = \
-    re.compile('([a-z]{2}(?:\-[a-z]{2})?(?:\-[a-z]{2})?)(?:[,;]|$)')
-regex_langfile = re.compile('^[a-z]{2}(-[a-z]{2})?\.py$')
+    re.compile('([a-z]{2,3}(?:\-[a-z]{2})?(?:\-[a-z]{2})?)(?:[,;]|$)')
+regex_langfile = re.compile('^[a-z]{2,3}(-[a-z]{2})?\.py$')
 regex_backslash = re.compile(r"\\([\\{}%])")
 regex_plural = re.compile('%({.+?})')
 regex_plural_dict = re.compile('^{(?P<w>[^()[\]][^()[\]]*?)\((?P<n>[^()\[\]]+)\)}$')  # %%{word(varname or number)}
@@ -179,7 +178,7 @@ def read_possible_plural_rules():
     """
     plurals = {}
     try:
-        import contrib.plural_rules as package
+        import gluon.contrib.plural_rules as package
         for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
             if len(modname) == 2:
                 module = __import__(package.__name__ + '.' + modname,
@@ -423,6 +422,10 @@ class lazyT(object):
             return lazyT(self)
         return lazyT(self.m, symbols, self.T, self.f, self.t, self.M)
 
+def pickle_lazyT(c):
+    return str, (c.xml(),)
+
+copy_reg.pickle(lazyT, pickle_lazyT)
 
 class translator(object):
     """
@@ -925,18 +928,6 @@ def findT(path, language=DEFAULT_LANGUAGE):
             DEFAULT_LANGUAGE_NAME if language in ('default', DEFAULT_LANGUAGE)
             else sentences['!langcode!'])
     write_dict(lang_file, sentences)
-
-### important to allow safe session.flash=T(....)
-
-
-def lazyT_unpickle(data):
-    return marshal.loads(data)
-
-
-def lazyT_pickle(data):
-    return lazyT_unpickle, (marshal.dumps(str(data)),)
-copy_reg.pickle(lazyT, lazyT_pickle, lazyT_unpickle)
-
 
 def update_all_languages(application_path):
     path = pjoin(application_path, 'languages/')
