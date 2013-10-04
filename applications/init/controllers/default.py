@@ -29,7 +29,8 @@ def index():
 
 def error():
     response.view = 'generic.html'
-    request.vars["ticket"] = URL(a="", c="default", f="ticket", host="localhost", args=request.vars["ticket"])
+    if 'ticket' in request.vars:
+        request.vars["ticket"] = URL(a="", c="default", f="ticket", host="localhost", args=request.vars["ticket"])
     return request.vars
 
 
